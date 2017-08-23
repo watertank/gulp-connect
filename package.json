@@ -1,11 +1,11 @@
 {
   "name": "gulp-connect-ex",
-  "version": "5.0.0",
+  "version": "5.0.1",
   "description": "Gulp plugin to run a webserver (with LiveReload)",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git://github.com/avevlad/gulp-connect"
+    "url": "git://github.com/wsw0108/gulp-connect-ex"
   },
   "authors": [
     {
