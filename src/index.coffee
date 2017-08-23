@@ -18,6 +18,7 @@ class ConnectApp
   constructor: (options) ->
     @name = options.name || "Server"
     @port = options.port || "8080"
+    @base = options.base || "/"
     @root = options.root || path.dirname(module.parent.id)
     @host = options.host || "localhost"
     @debug = options.debug || false
@@ -36,14 +37,17 @@ class ConnectApp
 
   run: ->
     @app = connect()
+    @subapp = connect()
 
     @handlers().forEach (middleware) =>
       if typeof (middleware) is "object"
-        @app.use middleware[0], middleware[1]
+        @subapp.use middleware[0], middleware[1]
       else
-        @app.use middleware
+        @subapp.use middleware
 
-    @app.use connect.directory(if typeof @root == "object" then @root[0] else @root)
+    @subapp.use connect.directory(if typeof @root == "object" then @root[0] else @root)
+
+    @app.use @base, @subapp
 
     if @https
 
@@ -169,6 +173,12 @@ module.exports =
           app.lr.changed body:
             files: file.path
       callback null, file
+  changed: (files = []) ->
+    files.map (file) ->
+      apps.forEach (app) =>
+        if app.livereload and typeof app.lr == "object"
+          app.lr.changed body:
+            files: file
   serverClose: ->
     apps.forEach((app) -> do app.server.close)
     apps = []

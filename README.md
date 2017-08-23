@@ -1,6 +1,8 @@
 gulp-connect [![Build Status](http://img.shields.io/travis/AveVlad/gulp-connect.svg?style=flat-square)](https://travis-ci.org/AveVlad/gulp-connect) [![](http://img.shields.io/npm/dm/gulp-connect.svg?style=flat-square)](https://www.npmjs.org/package/gulp-connect) [![](http://img.shields.io/npm/v/gulp-connect.svg?style=flat-square)](https://www.npmjs.org/package/gulp-connect) [![Join the chat at https://gitter.im/AveVlad/gulp-connect](https://badges.gitter.im/AveVlad/gulp-connect.svg)](https://gitter.im/AveVlad/gulp-connect?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 ==============
 
+*** This is a fork of https://github.com/AveVlad/gulp-connect with extra features. ***
+
 > Gulp plugin to run a webserver (with LiveReload)
 
 ## Sponsors
@@ -53,6 +55,43 @@ gulp.task('watch', function () {
 gulp.task('default', ['connect', 'watch']);
 ```
 
+#### LiveReload without gulp stream
+```js
+var gulp = require('gulp'),
+  Metalsmith = require('metalsmith'),
+  markdown = require('metalsmith-markdown'),
+  layouts = require('metalsmith-layouts'),
+  connect = require('gulp-connect');
+
+gulp.task('connect', function() {
+  connect.server({
+    root: 'build',
+    livereload: true
+  });
+});
+
+gulp.task('build', function (done) {
+  Metalsmith(__dirname)
+    .src('src')
+    .destination('build')
+    .use(markdown())
+    .use(layouts())
+    .build(function (err, files) {
+      if (err) {
+        done(err);
+        return;
+      }
+      connect.changed(Object.keys(files));
+      done();
+    });
+});
+
+gulp.task('watch', function () {
+  gulp.watch(['src/**/*'], ['build']);
+});
+
+gulp.task('default', ['connect', 'watch']);
+```
 
 #### Start and stop server
 
@@ -118,6 +157,13 @@ gulp.task('default', ['connectDist', 'connectDev', 'watch']);
 If the [http2](https://www.npmjs.com/package/http2) package is installed and you use an https connection to gulp connect then http 2 will be used in preference to http 1.
 
 ## API
+
+#### options.base
+
+Type: `String`
+Default: `/`
+
+The base url
 
 #### options.root
 

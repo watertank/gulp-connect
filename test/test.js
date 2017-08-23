@@ -64,6 +64,21 @@ describe('gulp-connect', function () {
         done()
       });
   })
+  it('Base test', function (done) {
+    connect.server({
+      base: "/base",
+      root: __dirname + "/fixtures/simplest"
+    });
+    request('http://localhost:8080/base')
+      .get('/index.html')
+      .expect(/index page/)
+      .expect(200)
+      .end(function (err, res) {
+        connect.serverClose()
+        if (err) return done(err);
+        done();
+      });
+  })
   it('Port test', function (done) {
     connect.server({
       root: __dirname + "/fixtures/multiple/app",
